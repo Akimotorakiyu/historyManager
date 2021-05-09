@@ -48,7 +48,7 @@ export function useHistory<T extends object>(initData: T) {
   }
 
   function canRedo() {
-    return status.index == 0 ? true : false;
+    return status.index !== 0 ? true : false;
   }
 
   function doProduce(deal: (draft: T) => void | T) {
