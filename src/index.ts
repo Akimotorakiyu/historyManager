@@ -70,3 +70,39 @@ export function useHistory<T extends object>(initData: T) {
     doProduce,
   };
 }
+
+
+// const {doProduce,undo,redo,canUndo,canRedo} = useHistory({x:0})
+
+// console.log(doProduce((draft)=>{
+//     draft.x=1
+// }))
+
+// console.log(doProduce((draft)=>{
+//     draft.x=2
+// }))
+
+// console.log(doProduce((draft)=>{
+//     draft.x=3
+// }))
+
+// console.log(doProduce((draft)=>{
+//     draft.x=4
+// }))
+
+
+// console.log(canUndo(),undo())
+// console.log(canUndo(),undo())
+// console.log(canUndo(),undo())
+// console.log(canUndo(),undo())
+// console.log(canUndo(),undo())
+// console.log(canUndo(),undo())
+// console.log(canUndo(),undo())
+
+// console.log(canRedo(),redo())
+// console.log(canRedo(),redo())
+// console.log(canRedo(),redo())
+// console.log(canRedo(),redo())
+// console.log(canRedo(),redo())
+// console.log(canRedo(),redo())
+// console.log(canRedo(),redo())
