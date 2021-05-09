@@ -4,54 +4,52 @@ enableAllPlugins();
 
 import { produce, produceWithPatches, Patch, nothing } from "immer";
 
-interface IMomentChange {
+interface IChangePatches {
   patches: Patch[];
   inversePatches: Patch[];
 }
 
 export function useHistory<T extends object>(initData: T) {
-  const history: IMomentChange[] = [];
 
   const status = {
     index: 0,
-    history,
+    history:<IChangePatches[]>[],
     showLog: false,
   };
 
-  const cache = {
-    initData,
-    data: initData,
+  const value = {
+    value: initData,
   };
 
   function undo() {
     const canDo = canUndo();
     if (canDo) {
-      const change = history[status.index];
-      cache.data = applyPatches(cache.data, change.inversePatches);
+      const change = status.history[status.index];
+      value.value = applyPatches(value.value, change.inversePatches);
       status.index++;
     }
 
     if (status.showLog) {
-      console.log(canDo, cache.data);
+      console.log(canDo, value.value);
     }
 
-    return cache.data;
+    return value.value;
   }
 
   function redo() {
     const canDo = canRedo();
 
     if (canDo) {
-      const change = history[status.index - 1];
-      cache.data = applyPatches(cache.data, change.patches);
+      const change = status.history[status.index - 1];
+      value.value = applyPatches(value.value, change.patches);
       status.index--;
-      cache.data;
+      value.value;
     }
 
     if (status.showLog) {
-      console.log(canDo, cache.data);
+      console.log(canDo, value.value);
     }
-    return cache.data;
+    return value.value;
   }
 
   function canUndo() {
@@ -64,23 +62,23 @@ export function useHistory<T extends object>(initData: T) {
 
   function doProduce(deal: (draft: T) => void | T) {
     if (status.index !== 0) {
-      history.splice(0, status.index);
+      status.history.splice(0, status.index);
       status.index = 0;
       if (status.showLog) {
         console.log("new world line");
       }
     }
-    cache.data = produce(cache.data, deal, (patches, inversePatches) => {
-      history.unshift({
+    value.value = produce(value.value, deal, (patches, inversePatches) => {
+      status.history.unshift({
         patches,
         inversePatches,
       });
     });
 
     if (status.showLog) {
-      console.log("n", cache.data);
+      console.log("n", value.value);
     }
-    return cache.data;
+    return value.value;
   }
 
   function showLog(show = true) {
@@ -95,7 +93,11 @@ export function useHistory<T extends object>(initData: T) {
     redo,
     canUndo,
     canRedo,
-    cache,
+    value:{
+      get value(){
+        return value.value
+      }
+    },
     doProduce,
     showLog,
   };
