@@ -3,7 +3,6 @@ import { applyPatches, enableAllPlugins } from "immer";
 enableAllPlugins();
 
 import { produce, produceWithPatches, Patch, nothing } from "immer";
-console.log("version", repoInfo.version);
 
 interface IMomentChange {
   patches: Patch[];
@@ -16,6 +15,7 @@ export function useHistory<T extends object>(initData: T) {
   const status = {
     index: 0,
     history,
+    showLog: false,
   };
 
   const cache = {
@@ -24,21 +24,32 @@ export function useHistory<T extends object>(initData: T) {
   };
 
   function undo() {
-    if (canUndo()) {
+    const canDo = canUndo();
+    if (canDo) {
       const change = history[status.index];
       cache.data = applyPatches(cache.data, change.inversePatches);
       status.index++;
+    }
+
+    if (status.showLog) {
+      console.log(canDo, cache.data);
     }
 
     return cache.data;
   }
 
   function redo() {
-    if (canRedo()) {
+    const canDo = canRedo();
+
+    if (canDo) {
       const change = history[status.index - 1];
       cache.data = applyPatches(cache.data, change.patches);
       status.index--;
       cache.data;
+    }
+
+    if (status.showLog) {
+      console.log(canDo, cache.data);
     }
     return cache.data;
   }
@@ -52,13 +63,31 @@ export function useHistory<T extends object>(initData: T) {
   }
 
   function doProduce(deal: (draft: T) => void | T) {
+    if (status.index !== 0) {
+      history.splice(0, status.index);
+      status.index = 0;
+      if (status.showLog) {
+        console.log("new world line");
+      }
+    }
     cache.data = produce(cache.data, deal, (patches, inversePatches) => {
       history.unshift({
         patches,
         inversePatches,
       });
     });
+
+    if (status.showLog) {
+      console.log("n", cache.data);
+    }
     return cache.data;
+  }
+
+  function showLog(show = true) {
+    if (show) {
+      console.log(`version: ${repoInfo.version}, start show log.`);
+    }
+    status.showLog = show;
   }
 
   return {
@@ -68,41 +97,79 @@ export function useHistory<T extends object>(initData: T) {
     canRedo,
     cache,
     doProduce,
+    showLog,
   };
 }
 
+// const { doProduce, undo, redo, canUndo, canRedo, showLog } = useHistory({
+//   x: 0,
+// });
 
-// const {doProduce,undo,redo,canUndo,canRedo} = useHistory({x:0})
+// showLog();
 
-// console.log(doProduce((draft)=>{
-//     draft.x=1
-// }))
+// doProduce((draft) => {
+//   draft.x = 1;
+// });
+// doProduce((draft) => {
+//   draft.x = 2;
+// });
+// doProduce((draft) => {
+//   draft.x = 3;
+// });
+// doProduce((draft) => {
+//   draft.x = 4;
+// });
 
-// console.log(doProduce((draft)=>{
-//     draft.x=2
-// }))
+// undo();
+// undo();
+// undo();
+// undo();
+// undo();
+// undo();
+// undo();
 
-// console.log(doProduce((draft)=>{
-//     draft.x=3
-// }))
+// redo();
+// redo();
+// redo();
+// redo();
+// redo();
+// redo();
+// redo();
 
-// console.log(doProduce((draft)=>{
-//     draft.x=4
-// }))
+// undo();
+// undo();
+// undo();
 
+// doProduce((draft) => {
+//   draft.x = 0;
+// });
+// doProduce((draft) => {
+//   draft.x = -1;
+// });
+// doProduce((draft) => {
+//   draft.x = -2;
+// });
 
-// console.log(canUndo(),undo())
-// console.log(canUndo(),undo())
-// console.log(canUndo(),undo())
-// console.log(canUndo(),undo())
-// console.log(canUndo(),undo())
-// console.log(canUndo(),undo())
-// console.log(canUndo(),undo())
+// doProduce((draft) => {
+//   draft.x = -3;
+// });
 
-// console.log(canRedo(),redo())
-// console.log(canRedo(),redo())
-// console.log(canRedo(),redo())
-// console.log(canRedo(),redo())
-// console.log(canRedo(),redo())
-// console.log(canRedo(),redo())
-// console.log(canRedo(),redo())
+// doProduce((draft) => {
+//   draft.x = -4;
+// });
+
+// undo();
+// undo();
+// undo();
+// undo();
+// undo();
+// undo();
+// undo();
+
+// redo();
+// redo();
+// redo();
+// redo();
+// redo();
+// redo();
+// redo();
