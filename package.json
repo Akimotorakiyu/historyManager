@@ -1,0 +1,16 @@
+{
+  "name": "history-manager",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "湫曗 <autumnsilverleaves@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "serve":"vite"
+  },
+  "dependencies": {
+    "immer": "^9.0.2"
+  },
+  "devDependencies": {
+    "vite": "^2.2.4"
+  }
+}
