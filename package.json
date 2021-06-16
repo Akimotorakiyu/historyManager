@@ -5,10 +5,11 @@
   "author": "湫曗 <autumnsilverleaves@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "serve":"vite"
+    "serve": "vite"
   },
   "dependencies": {
-    "immer": "^9.0.2"
+    "immer": "^9.0.2",
+    "nanoid": "^3.1.23"
   },
   "devDependencies": {
     "vite": "^2.2.4"
